@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Pomodoro daemon with FSM
 
 # from __future__ import print_function
@@ -13,10 +13,10 @@ from past.utils import old_div
 import os
 import threading
 from tasklib import TaskWarrior, Task
-# import datetime 
+# import datetime
 from datetime import datetime
 
-#For GUI 
+#For GUI
 import subprocess
 from gi.repository import GObject
 import sys
@@ -77,8 +77,8 @@ class Pomodoro(dbus.service.Object):
     #Total time elapsed
     time_elapsed = 0
     last_task_id = 0
-    tw = None 
-    timer = None 
+    tw = None
+    timer = None
     # default systray icon
     systrayIcon = "images/iconStarted-0.png"
 
@@ -134,8 +134,8 @@ class Pomodoro(dbus.service.Object):
             return "no previous task"
 
         #only update time_elapsed when paused
-        if  self.state == "stopped":  
-            self.time_elapsed = 0 
+        if  self.state == "stopped":
+            self.time_elapsed = 0
         self.state = "started"
 
         return "ok"
@@ -174,10 +174,10 @@ class Pomodoro(dbus.service.Object):
             if active['project']:
                 #must work in utf8
                 if u''.join(active['project']).encode('utf-8').strip()  != "":
-                    project=u''.join(active['project']).encode('utf-8').strip() 
+                    project=u''.join(active['project']).encode('utf-8').strip()
             if active['description']:
                 if u''.join(active['description']).encode('utf-8').strip()  != "":
-                    desc=u''.join(active['description']).encode('utf-8').strip() 
+                    desc=u''.join(active['description']).encode('utf-8').strip()
             msg="\nBreak num:"+str(self.breaks)+" Continuous mode:"+str(self.continuous)+"\nProject:"+project+"\n"+desc
         elif self.last_task_id != 0:
             last=self.tw.tasks.get(uuid=self.last_task_id)
@@ -185,10 +185,10 @@ class Pomodoro(dbus.service.Object):
             if last['project']:
                 #must work in utf8
                 if u''.join(last['project']).encode('utf-8').strip()  != "":
-                    project=u''.join(last['project']).encode('utf-8').strip() 
+                    project=u''.join(last['project']).encode('utf-8').strip()
             if last['description']:
                 if u''.join(last['description']).encode('utf-8').strip()  != "":
-                    desc=u''.join(last['description']).encode('utf-8').strip() 
+                    desc=u''.join(last['description']).encode('utf-8').strip()
             msg="\nBreak num:"+str(self.breaks)+" Continuous mode:"+str(self.continuous)+"\nLast Project:"+project+"\n"+desc
 
         rest = old_div(self.timer_pomodoro, 8)
@@ -201,13 +201,13 @@ class Pomodoro(dbus.service.Object):
         i_paused  = "images/iconPaused.png"
         i_stopped = "images/iconStopped.png"
         if self.state == "started" and not active:
-            self.systrayIcon=i_no_task 
+            self.systrayIcon=i_no_task
         elif self.state == "started":
-            self.systrayIcon=i_started 
+            self.systrayIcon=i_started
         elif self.state == "paused":
             self.systrayIcon=i_paused
         elif self.state == "stopped":
-            self.systrayIcon=i_stopped 
+            self.systrayIcon=i_stopped
 
         return self.state+" "+remaining+" left"+msg
 
@@ -268,7 +268,7 @@ class Pomodoro(dbus.service.Object):
                 new.start()
                 self.last_task_id = uid
                 if resume == 'No':
-                    self.time_elapsed = 0 
+                    self.time_elapsed = 0
                 self.update_systray()
                 return ["started:"+uid]
             else:
@@ -282,12 +282,12 @@ class Pomodoro(dbus.service.Object):
                 return ["Incorrect uuid:"+uid+" .The task can't be started"]
 
             if resume == 'No':
-                self.time_elapsed = 0 
+                self.time_elapsed = 0
             self.last_task_id = uid
             self.update_systray()
             return ["started:"+uid]
 
-   
+
     @dbus.service.method("org.liloman.pomodoroInterface", in_signature='s', out_signature='as')
     def do_fsm(self, event):
         fsm = "{0}-{1}".format(self.state,event)
@@ -307,7 +307,7 @@ class Pomodoro(dbus.service.Object):
             interface_systray.do_quit()
         except:
             # print "systray not found"
-            return 
+            return
 
     @dbus.service.method("org.liloman.pomodoroInterface", in_signature='', out_signature='as')
     def done_current(self):
@@ -321,14 +321,13 @@ class Pomodoro(dbus.service.Object):
     def do_quit(self,close_systray):
         #stop timer
         self.timer.cancel()
-        #close systray 
-        if close_systray: 
+        #close systray
+        if close_systray:
             self.close_systray()
         # Exit daemon
         loop.quit()
 
-
-if __name__ == '__main__':
+def main():
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
     loop = GObject.MainLoop()
 
@@ -347,9 +346,12 @@ if __name__ == '__main__':
 
     #run the systray
     if len(sys.argv) == 2:
-            subprocess.Popen(['./systray.py', sys.argv[1]])
+        # Use sys.executable instead of relying on Unix executable bit privlages.
+        subprocess.Popen([sys.executable, './systray.py', sys.argv[1]])
     elif len(sys.argv) == 1:
-        subprocess.Popen(['./systray.py'])
+        subprocess.Popen([sys.executable, './systray.py'])
     #dont lauch the systray when testing len(sys.argv)==3
 
     loop.run()
+
+if __name__ == '__main__': main()

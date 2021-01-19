@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #Basic client for the pomodoroTasks2 daemon
 
 # from __future__ import print_function
@@ -134,8 +134,7 @@ class Client(object):
             sys.exit(1)
 
 
-if __name__ == '__main__':
-
+def main():
     if len(sys.argv) == 1:
         print("must pass and option. try "+os.path.basename(sys.argv[0])+" -h")
         sys.exit(1)
@@ -165,5 +164,5 @@ if __name__ == '__main__':
     # Execute the command
     client.doCommand(sys.argv[1])
 
-
+if __name__ == '__main__': main()
 
